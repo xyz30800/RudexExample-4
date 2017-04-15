@@ -1,0 +1,20 @@
+History:
+
+The purpose manages the url change.
+Basically its how our application is going to work directly with the url.
+
+React-Router:
+
+React-Router takes url and purpose is to change the component that are being used in our application
+It takes url and depending on the chacacters that url, returning a different set of component to react baesd on this url.
+It takes url and decides what components react need to show based on the url.
+
+browserHistory:
+Whenever the url updates or changes, react-router is going to interpret everything after the proocol. 
+
+IndexRoute:
+The route only matches the parent then show this IndexRoute kind of default route for us
+
+
+Lifecycle:
+Lifecycle method is a function on raect component class that is automatically call by raect.
