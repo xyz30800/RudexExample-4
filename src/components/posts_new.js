@@ -1,7 +1,23 @@
+import _ from 'lodash';
 import React, { Component, PropTypes} from 'react';
 import { reduxForm } from 'redux-form';
 import { createPost } from '../actions/index';
 import { Link } from 'react-router';
+
+const FIELDS = {
+	title:{
+		type: 'input',
+		label: 'Title for post'
+	},
+	categories: {
+		type: 'input',
+		label: 'Enter some categories for this post'
+	},
+	content: {
+		type: 'input',
+		label: 'Post content'
+	}
+}
 
 class PostsNew extends Component {
 	// React interprets this object whenever an instance of 'PostsNew' is created.
@@ -25,10 +41,25 @@ class PostsNew extends Component {
 			})
 	}
 
+	renderField(fieldConfig, field) {
+		const fieldHelper = this.props.fields[field];
+		
+		return (
+			<div className={`form-group${fieldHelper.touched && fieldHelper.invalid ? ' has-danger' : ''}`}>
+				<label>{fieldConfig.label}</label>
+				{/* It kind of structures the object into its separate keys and values and passes it into the input */}
+				<fieldConfig.type type="text" className="form-control" {...fieldHelper} />
+				<div className="text-help">
+					{ fieldHelper.touched ? fieldHelper.error : '' }
+				</div>
+			</div>
+		);
+	}
+
 	render() {
 		// This props injected by redux-form at bottom
 		// Assign variable to title, categories, content and handleSubmit from this.props
-		const { fields: { title, categories, content }, handleSubmit } = this.props; // ES6 syntax
+		const { handleSubmit } = this.props; // ES6 syntax
 		// is equals to 'const handleSubmit = this.props.handleSubmit;'
 		// fields: { title, categories, content }' is equals to
 		// const title = this.props.fields.title;
@@ -39,33 +70,9 @@ class PostsNew extends Component {
 			<form onSubmit={handleSubmit(this.onSubmit.bind(this))}>{/* original: handleSubmit(this.props.createPost) */}
 				{/* Go find action creator We can pass it to handleSubmit, and action creator will be called with the property of the form */}
 				<h3>Create A New Post</h3>
-				<div className={`form-group${title.touched && title.invalid ? ' has-danger' : ''}`}>
-					<label>Title</label>
-					{/* It kind of structures the object into its separate keys and values and passes it into the input */}
-					<input type="text" className="form-control" {...title} />
-					<div className="text-help">
-						{ title.touched ? title.error : '' }
-					</div>
-				</div>
-				<div className={`form-group${categories.touched && categories.invalid ? ' has-danger' : ''}`}>
-					<label>Categories</label>
-					<input type="text" className="form-control" {...categories} />
-					<div className="text-help">
-						{ categories.touched ? categories.error : '' }
-					</div>
-				</div>
-				<div className={`form-group${content.touched && content.invalid ? ' has-danger' : ''}`}>
-					<label>Content</label>
-					<textarea className="form-control" {...content} />
-					<div className="text-help">
-						{ content.touched ? content.error : '' }
-					</div>
-				</div>
-
+					{_.map(FIELDS, this.renderField.bind(this))}
 				<button type="sumbit" className="btn btn-primary">Sumbit</button>
-				<Link to="" className="btn btn-danger">
-					Cancel
-				</Link>	
+				<Link to="" className="btn btn-danger">Cancel</Link>	
 			</form>
 		)
 	}
@@ -74,16 +81,22 @@ class PostsNew extends Component {
 function validate(values) {
 	const errors = {};
 
+	_.forEach(FIELDS, (type, field) => {
+	  	if (!values[field]) {
+	  		errors[field] = `Enter a ${field}`;
+	  	}
+	});
+	
 	// If the object has a key that match one of our field
-	if (!values.title) {
-		errors.title = 'Enter a username';
-	}
-	if (!values.categories) {
-		errors.categories = 'Enter a username';
-	}
-	if (!values.content) {
-		errors.content = 'Enter a username';
-	}
+	// if (values.title) {
+	// 	errors.title = 'Enter a username';
+	// }
+	// if (!values.categories) {
+	// 	errors.categories = 'Enter a username';
+	// }
+	// if (!values.content) {
+	// 	errors.content = 'Enter a username';
+	// }
 
 	return errors;
 }
@@ -92,7 +105,7 @@ function validate(values) {
 // redux-form: 1st is form config, 2nd is mapStateToProps, 3rd is mapDispatchToProps
 // Set up config for this form 
 export default reduxForm({
-	form: 'PostNewForm2',
-	fields: ['title', 'categories', 'content'],
+	form: 'PostNewForm',
+	fields: _.keys(FIELDS),
 	validate // is equals to 'validate: validate'
 }, null, { createPost })(PostsNew);
